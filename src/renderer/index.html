@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FZautochoice — Cross-platform auto-click desktop application with OCR dialog detection" />
+  <title>FZautochoice</title>
+  <link rel="stylesheet" href="./index.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ═══════════ Titlebar ═══════════ -->
+    <div class="titlebar" id="titlebar">
+      <div class="titlebar__logo">
+        <div class="titlebar__logo-icon">FZ</div>
+        <span class="titlebar__title">FZautochoice</span>
+        <span class="titlebar__version">v1.0.0</span>
+      </div>
+      <div class="titlebar__spacer"></div>
+      <div class="titlebar__status">
+        <span class="titlebar__status-dot" id="titlebar-status-dot"></span>
+        <span class="titlebar__status-text" id="titlebar-status-text">Idle</span>
+      </div>
+      <div class="titlebar__controls">
+        <button class="titlebar__btn" id="btn-minimize" title="Minimize">─</button>
+        <button class="titlebar__btn" id="btn-maximize" title="Maximize">□</button>
+        <button class="titlebar__btn titlebar__btn--close" id="btn-close" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ Tab Bar ═══════════ -->
+    <nav class="tab-bar" id="tab-bar">
+      <button class="tab-bar__tab tab-bar__tab--active" data-tab="detection" id="tab-detection">
+        <span class="tab-bar__tab-icon">🔍</span> Detection
+      </button>
+      <button class="tab-bar__tab" data-tab="actions" id="tab-actions">
+        <span class="tab-bar__tab-icon">⚡</span> Actions
+      </button>
+      <button class="tab-bar__tab" data-tab="schemas" id="tab-schemas">
+        <span class="tab-bar__tab-icon">💾</span> Schemas
+      </button>
+      <button class="tab-bar__tab" data-tab="ai" id="tab-ai">
+        <span class="tab-bar__tab-icon">🤖</span> AI Integration
+      </button>
+      <button class="tab-bar__tab" data-tab="settings" id="tab-settings">
+        <span class="tab-bar__tab-icon">⚙️</span> Settings
+      </button>
+
+      <div class="tab-bar__spacer"></div>
+
+      <div class="tab-bar__global-actions">
+        <button class="btn btn--success btn--sm" id="btn-start-global" title="Start Monitoring">
+          ▶ Start
+        </button>
+        <button class="btn btn--danger btn--sm" id="btn-stop-global" title="Stop Monitoring" style="display:none;">
+          ⏹ Stop
+        </button>
+      </div>
+    </nav>
+
+    <!-- ═══════════ Content Area ═══════════ -->
+    <div class="content">
+
+      <!-- ──── Detection Tab ──── -->
+      <div class="tab-content tab-content--active" id="content-detection">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🎯</span> Dialog Text Matching</div>
+              <div class="card__subtitle">Enter text from the dialog title or question to detect</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="detection-text">Title or Question Text</label>
+            <input type="text" class="form-input" id="detection-text"
+              placeholder="Enter part of the dialog title or the beginning of the question to detect..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="detection-content">Additional Content Text (optional)</label>
+            <textarea class="form-input" id="detection-content" rows="2"
+              placeholder="Enter additional body text to narrow matching..."></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Match Mode</label>
+              <select class="form-input" id="match-mode">
+                <option value="contains">Contains (partial match)</option>
+                <option value="exact">Exact Match</option>
+                <option value="regex">Regular Expression</option>
+                <option value="fuzzy">Fuzzy Match (AI-assisted)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Scan Region</label>
+              <select class="form-input" id="scan-region">
+                <option value="fullscreen">Full Screen</option>
+                <option value="active-window">Active Window Only</option>
+                <option value="custom">Custom Region</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">📋</span> Detectable Options</div>
+              <div class="card__subtitle">Add dialog options/buttons to detect — check the ones to auto-click</div>
+            </div>
+            <button class="btn btn--ghost btn--sm" id="btn-add-option">+ Add Option</button>
+          </div>
+          <div class="option-list" id="option-list">
+            <!-- Default options pre-populated -->
+            <div class="option-item" data-option="Allow">
+              <input type="checkbox" checked />
+              <span class="option-item__text">Allow</span>
+              <span class="option-item__badge option-item__badge--click">Auto-Click</span>
+              <button class="btn btn--ghost btn--icon-sm option-item__delete" title="Remove">✕</button>
+            </div>
+            <div class="option-item" data-option="Yes">
+              <input type="checkbox" checked />
+              <span class="option-item__text">Yes</span>
+              <span class="option-item__badge option-item__badge--click">Auto-Click</span>
+              <button class="btn btn--ghost btn--icon-sm option-item__delete" title="Remove">✕</button>
+            </div>
+            <div class="option-item" data-option="No">
+              <input type="checkbox" />
+              <span class="option-item__text">No</span>
+              <span class="option-item__badge option-item__badge--skip">Skip</span>
+              <button class="btn btn--ghost btn--icon-sm option-item__delete" title="Remove">✕</button>
+            </div>
+          </div>
+          <div class="add-row mt-3">
+            <input type="text" class="form-input" id="new-option-text"
+              placeholder="Type option text (e.g., Accept, OK, Continue)..." />
+            <button class="btn btn--primary btn--sm" id="btn-add-option-confirm">+ Add</button>
+          </div>
+        </div>
+
+        <div class="status-bar" id="status-bar">
+          <div class="status-bar__indicator">
+            <span class="status-bar__dot"></span>
+            <span id="status-text">Monitoring Idle</span>
+          </div>
+          <div class="status-bar__stats">
+            <div class="status-bar__stat">
+              Scans: <span class="status-bar__stat-value" id="stat-scans">0</span>
+            </div>
+            <div class="status-bar__stat">
+              Matches: <span class="status-bar__stat-value" id="stat-matches">0</span>
+            </div>
+            <div class="status-bar__stat">
+              Clicks: <span class="status-bar__stat-value" id="stat-clicks">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <button class="btn btn--success btn--lg" id="btn-start">▶ Start Monitoring</button>
+          <button class="btn btn--danger btn--lg" id="btn-stop" style="display:none;">⏹ Stop</button>
+          <button class="btn btn--ghost" id="btn-test">🧪 Test Scan</button>
+          <button class="btn btn--ghost" id="btn-capture-region">📐 Select Region</button>
+        </div>
+      </div>
+
+      <!-- ──── Actions Tab ──── -->
+      <div class="tab-content" id="content-actions">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🖱️</span> Auto-Click Targets</div>
+              <div class="card__subtitle">Buttons/text to automatically click when a dialog is detected</div>
+            </div>
+          </div>
+          <div class="action-targets" id="action-targets">
+            <div class="action-target" data-target="Yes">
+              <span class="action-target__text">Yes</span>
+              <span class="action-target__remove" title="Remove">✕</span>
+            </div>
+            <div class="action-target" data-target="Submit">
+              <span class="action-target__text">Submit</span>
+              <span class="action-target__remove" title="Remove">✕</span>
+            </div>
+            <div class="action-target" data-target="OK">
+              <span class="action-target__text">OK</span>
+              <span class="action-target__remove" title="Remove">✕</span>
+            </div>
+            <div class="action-target" data-target="Allow">
+              <span class="action-target__text">Allow</span>
+              <span class="action-target__remove" title="Remove">✕</span>
+            </div>
+          </div>
+          <div class="add-row mt-3">
+            <input type="text" class="form-input" id="new-target-text"
+              placeholder="Add click target (e.g., Accept, Continue, Confirm)..." />
+            <button class="btn btn--primary btn--sm" id="btn-add-target">+ Add Target</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🔗</span> Action Sequence</div>
+              <div class="card__subtitle">Define a multi-step click sequence for complex dialogs</div>
+            </div>
+            <button class="btn btn--ghost btn--sm" id="btn-add-step">+ Add Step</button>
+          </div>
+          <div class="workflow-steps" id="action-sequence">
+            <div class="workflow-step">
+              <div class="workflow-step__number">1</div>
+              <div class="workflow-step__content">
+                <div class="workflow-step__title">Detect dialog with matching text</div>
+                <div class="workflow-step__desc">OCR scans screen for configured text patterns</div>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="workflow-step__number">2</div>
+              <div class="workflow-step__content">
+                <div class="workflow-step__title">Locate target button</div>
+                <div class="workflow-step__desc">Find "Yes" / "Submit" button position via OCR</div>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="workflow-step__number">3</div>
+              <div class="workflow-step__content">
+                <div class="workflow-step__title">Execute click</div>
+                <div class="workflow-step__desc">Simulate mouse click at button coordinates</div>
+              </div>
+            </div>
+            <div class="workflow-step">
+              <div class="workflow-step__number">4</div>
+              <div class="workflow-step__content">
+                <div class="workflow-step__title">Wait & verify</div>
+                <div class="workflow-step__desc">Wait for dialog to close, then resume scanning</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">⌨️</span> Keyboard Actions</div>
+              <div class="card__subtitle">Simulate keyboard input after detection</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Key to Press</label>
+              <select class="form-input" id="keyboard-key">
+                <option value="">None</option>
+                <option value="enter">Enter / Return</option>
+                <option value="tab">Tab</option>
+                <option value="escape">Escape</option>
+                <option value="space">Space</option>
+                <option value="y">Y key</option>
+                <option value="n">N key</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Delay after click (ms)</label>
+              <input type="number" class="form-input" id="click-delay" value="500" min="0" max="10000" step="100" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Click Type</label>
+              <select class="form-input" id="click-type">
+                <option value="single">Single Click</option>
+                <option value="double">Double Click</option>
+                <option value="right">Right Click</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Post-Click Action</label>
+              <select class="form-input" id="post-click-action">
+                <option value="resume">Resume Scanning</option>
+                <option value="wait">Wait N seconds</option>
+                <option value="stop">Stop Monitoring</option>
+                <option value="next-schema">Load Next Schema</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ──── Schemas Tab ──── -->
+      <div class="tab-content" id="content-schemas">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">💾</span> Saved Schemas</div>
+              <div class="card__subtitle">Manage your auto-click configuration presets</div>
+            </div>
+            <div class="flex-row gap-2">
+              <button class="btn btn--primary btn--sm" id="btn-save-schema">💾 Save Current</button>
+              <button class="btn btn--ghost btn--sm" id="btn-import-schema">📥 Import</button>
+              <button class="btn btn--ghost btn--sm" id="btn-export-schema">📤 Export</button>
+            </div>
+          </div>
+          <div class="schema-list" id="schema-list">
+            <div class="schema-item schema-item--active" data-schema="example-allow">
+              <div class="schema-item__icon">📋</div>
+              <div class="schema-item__info">
+                <div class="schema-item__name">Allow Dialog Handler</div>
+                <div class="schema-item__desc">Auto-clicks "Allow" and "Yes" on permission dialogs</div>
+              </div>
+              <span class="tag tag--primary">Active</span>
+              <div class="schema-item__actions">
+                <button class="btn btn--ghost btn--icon-sm" title="Edit">✏️</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Duplicate">📋</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Delete">🗑️</button>
+              </div>
+            </div>
+            <div class="schema-item" data-schema="update-accept">
+              <div class="schema-item__icon">📋</div>
+              <div class="schema-item__info">
+                <div class="schema-item__name">Update Acceptor</div>
+                <div class="schema-item__desc">Accepts software update dialogs automatically</div>
+              </div>
+              <div class="schema-item__actions">
+                <button class="btn btn--ghost btn--icon-sm" title="Edit">✏️</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Duplicate">📋</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Delete">🗑️</button>
+              </div>
+            </div>
+            <div class="schema-item" data-schema="cookie-consent">
+              <div class="schema-item__icon">📋</div>
+              <div class="schema-item__info">
+                <div class="schema-item__name">Cookie Consent Clicker</div>
+                <div class="schema-item__desc">Clicks "Accept" on cookie consent banners</div>
+              </div>
+              <div class="schema-item__actions">
+                <button class="btn btn--ghost btn--icon-sm" title="Edit">✏️</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Duplicate">📋</button>
+                <button class="btn btn--ghost btn--icon-sm" title="Delete">🗑️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">📝</span> Schema Details</div>
+              <div class="card__subtitle">Edit the selected schema configuration</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="schema-name">Schema Name</label>
+            <input type="text" class="form-input" id="schema-name" value="Allow Dialog Handler" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="schema-description">Description</label>
+            <textarea class="form-input" id="schema-description" rows="2">Auto-clicks "Allow" and "Yes" on permission dialogs</textarea>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Created</label>
+              <input type="text" class="form-input" value="2026-06-29" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Modified</label>
+              <input type="text" class="form-input" value="2026-06-29" readonly />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ──── AI Integration Tab ──── -->
+      <div class="tab-content" id="content-ai">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🤖</span> AI Provider Configuration</div>
+              <div class="card__subtitle">Connect to local or remote AI for intelligent dialog analysis</div>
+            </div>
+            <button class="btn btn--ghost btn--sm" id="btn-detect-ai">🔍 Auto-Detect</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+            <div class="ai-provider-card" data-provider="ollama" id="provider-ollama">
+              <div class="ai-provider-card__logo">🦙</div>
+              <div class="ai-provider-card__info">
+                <div class="ai-provider-card__name">Ollama</div>
+                <div class="ai-provider-card__desc">Local LLM inference — Private & fast</div>
+              </div>
+              <span class="ai-provider-card__status ai-provider-card__status--unknown" id="ollama-status">Not tested</span>
+            </div>
+            <div class="ai-provider-card" data-provider="claude" id="provider-claude">
+              <div class="ai-provider-card__logo">🧠</div>
+              <div class="ai-provider-card__info">
+                <div class="ai-provider-card__name">Claude Code CLI</div>
+                <div class="ai-provider-card__desc">Anthropic Claude via CLI — Advanced reasoning</div>
+              </div>
+              <span class="ai-provider-card__status ai-provider-card__status--unknown" id="claude-status">Not tested</span>
+            </div>
+            <div class="ai-provider-card" data-provider="openai-compat" id="provider-openai">
+              <div class="ai-provider-card__logo">🔗</div>
+              <div class="ai-provider-card__info">
+                <div class="ai-provider-card__name">OpenAI-Compatible API</div>
+                <div class="ai-provider-card__desc">LM Studio, vLLM, text-generation-webui, etc.</div>
+              </div>
+              <span class="ai-provider-card__status ai-provider-card__status--unknown" id="openai-status">Not tested</span>
+            </div>
+            <div class="ai-provider-card" data-provider="custom" id="provider-custom">
+              <div class="ai-provider-card__logo">🌐</div>
+              <div class="ai-provider-card__info">
+                <div class="ai-provider-card__name">Custom REST Endpoint</div>
+                <div class="ai-provider-card__desc">Any REST API with JSON request/response</div>
+              </div>
+              <span class="ai-provider-card__status ai-provider-card__status--unknown" id="custom-status">Not tested</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🔧</span> Endpoint Configuration</div>
+              <div class="card__subtitle">Configure the selected AI provider connection</div>
+            </div>
+            <button class="btn btn--primary btn--sm" id="btn-test-ai">🧪 Test Connection</button>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="ai-endpoint">API Endpoint URL</label>
+              <input type="text" class="form-input form-input--mono" id="ai-endpoint"
+                placeholder="http://localhost:11434/api/generate" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ai-model">Model</label>
+              <select class="form-input" id="ai-model">
+                <option value="">Select a model...</option>
+                <option value="llama3.2">llama3.2</option>
+                <option value="mistral">mistral</option>
+                <option value="codellama">codellama</option>
+                <option value="gemma2">gemma2</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ai-api-key">API Key (if required)</label>
+            <input type="password" class="form-input form-input--mono" id="ai-api-key"
+              placeholder="Leave empty for local models (Ollama)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ai-cli-path">CLI Path (for Claude Code)</label>
+            <input type="text" class="form-input form-input--mono" id="ai-cli-path"
+              placeholder="/usr/local/bin/claude or claude (if in PATH)" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🧠</span> AI-Powered Workflow</div>
+              <div class="card__subtitle">Use AI to analyze dialogs and make complex decisions</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ai-prompt-template">Analysis Prompt Template</label>
+            <textarea class="form-input form-input--mono" id="ai-prompt-template" rows="5">You are analyzing a dialog box detected on screen. 
+The dialog contains the following text: {{detected_text}}
+The user wants to automatically handle dialogs matching: {{match_pattern}}
+Available buttons: {{available_buttons}}
+
+Decide which button to click and explain why. 
+Respond in JSON: {"action": "click", "target": "button_name", "confidence": 0.95, "reason": "..."}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-group">
+              <input type="checkbox" id="ai-auto-decide" />
+              Enable AI auto-decision (AI decides which button to click)
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Minimum AI Confidence to Auto-Click</label>
+            <div class="flex-row gap-2">
+              <input type="range" min="0" max="100" value="85" id="ai-confidence-threshold"
+                style="flex:1; accent-color: var(--accent-primary);" />
+              <span class="tag tag--primary" id="ai-confidence-value">85%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🧪</span> AI Test Lab</div>
+              <div class="card__subtitle">Test AI analysis with sample dialog text</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ai-test-input">Sample Dialog Text</label>
+            <textarea class="form-input" id="ai-test-input" rows="3"
+              placeholder="Paste dialog text here to test AI analysis...">Do you want to allow this application to make changes to your device?
+[Yes] [No]</textarea>
+          </div>
+          <button class="btn btn--primary mt-2" id="btn-ai-analyze">🤖 Analyze with AI</button>
+          <div class="form-group mt-3">
+            <label class="form-label">AI Response</label>
+            <pre class="form-input form-input--mono" id="ai-test-output" style="min-height:80px; white-space:pre-wrap; overflow:auto;">AI response will appear here...</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ──── Settings Tab ──── -->
+      <div class="tab-content" id="content-settings">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">⏱️</span> Scan Configuration</div>
+              <div class="card__subtitle">Configure how frequently and how the screen is scanned</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="scan-interval">Scan Interval (ms)</label>
+              <input type="number" class="form-input" id="scan-interval" value="2000" min="500" max="30000" step="500" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ocr-language">OCR Language</label>
+              <select class="form-input" id="ocr-language">
+                <option value="eng">English</option>
+                <option value="por">Portuguese</option>
+                <option value="spa">Spanish</option>
+                <option value="fra">French</option>
+                <option value="deu">German</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="confidence-threshold">OCR Confidence Threshold (%)</label>
+              <input type="number" class="form-input" id="confidence-threshold" value="70" min="0" max="100" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="max-retries">Max Click Retries</label>
+              <input type="number" class="form-input" id="max-retries" value="3" min="1" max="10" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">🔔</span> Notifications & Behavior</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex-between">
+              <span class="form-label" style="margin-bottom:0;">Show notification on click</span>
+              <label class="toggle">
+                <input type="checkbox" id="notify-on-click" checked />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex-between">
+              <span class="form-label" style="margin-bottom:0;">Play sound on match</span>
+              <label class="toggle">
+                <input type="checkbox" id="sound-on-match" />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex-between">
+              <span class="form-label" style="margin-bottom:0;">Start minimized to tray</span>
+              <label class="toggle">
+                <input type="checkbox" id="start-minimized" />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex-between">
+              <span class="form-label" style="margin-bottom:0;">Start monitoring on launch</span>
+              <label class="toggle">
+                <input type="checkbox" id="auto-start-monitor" />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex-between">
+              <span class="form-label" style="margin-bottom:0;">Log all OCR results (verbose)</span>
+              <label class="toggle">
+                <input type="checkbox" id="verbose-logging" />
+                <span class="toggle__slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">⌨️</span> Global Hotkeys</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="hotkey-start">Start/Stop Monitoring</label>
+              <input type="text" class="form-input form-input--mono" id="hotkey-start" value="Ctrl+Shift+F9" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="hotkey-test">Quick Test Scan</label>
+              <input type="text" class="form-input form-input--mono" id="hotkey-test" value="Ctrl+Shift+F10" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">ℹ️</span> About FZautochoice</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Version</label>
+              <input type="text" class="form-input" value="1.0.0" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Platform</label>
+              <input type="text" class="form-input" id="platform-info" value="Detecting..." readonly />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">OCR Engine</label>
+            <input type="text" class="form-input" value="Tesseract.js v5" readonly />
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- ═══════════ Activity Log Panel ═══════════ -->
+    <div class="resize-handle" id="log-resize"></div>
+    <div class="log-panel" id="log-panel">
+      <div class="log-panel__header">
+        <div class="log-panel__title">
+          📋 Activity Log <span class="log-panel__badge" id="log-count">0</span>
+        </div>
+        <div class="log-panel__actions">
+          <button class="btn btn--ghost btn--icon-sm" id="btn-clear-log" title="Clear log">🗑️</button>
+          <button class="btn btn--ghost btn--icon-sm" id="btn-export-log" title="Export log">📤</button>
+        </div>
+      </div>
+      <div class="log-panel__body" id="log-body">
+        <div class="log-entry log-entry--info">
+          <span class="log-entry__time">--:--:--</span>
+          <span class="log-entry__icon">ℹ️</span>
+          <span class="log-entry__text">FZautochoice v1.0.0 ready. Configure detection settings and start monitoring.</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

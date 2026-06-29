@@ -1,0 +1,60 @@
+appId: com.rluf.fzautochoice
+productName: FZautochoice
+copyright: Copyright © 2026 RLuf
+
+directories:
+  buildResources: resources
+  output: dist
+
+files:
+  - out/**/*
+  - "!out/**/*.map"
+
+extraResources:
+  - from: schemas/
+    to: schemas/
+    filter:
+      - "**/*.fzschema"
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon.png
+  artifactName: "FZautochoice-${version}-win-${arch}.${ext}"
+
+portable:
+  artifactName: "FZautochoice-${version}-portable.exe"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: "FZautochoice-${version}-setup.exe"
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  icon: resources/icon.png
+  category: Utility
+  artifactName: "FZautochoice-${version}-linux-${arch}.${ext}"
+  desktop:
+    Name: FZautochoice
+    Comment: Auto-click dialog detection tool
+    Categories: Utility;Accessibility;
+
+appImage:
+  artifactName: "FZautochoice-${version}.AppImage"
+
+publish:
+  provider: github
+  owner: RLuf
+  repo: fzautochose

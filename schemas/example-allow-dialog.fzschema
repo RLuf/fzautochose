@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "name": "Allow Dialog Handler",
+  "description": "Auto-clicks 'Allow' and 'Yes' on permission dialogs. Example schema demonstrating basic dialog detection and auto-click.",
+  "createdAt": "2026-06-29T00:00:00.000Z",
+  "modifiedAt": "2026-06-29T00:00:00.000Z",
+  "detection": {
+    "text": "Do you want to allow",
+    "content": "",
+    "matchMode": "contains",
+    "scanRegion": "fullscreen",
+    "options": [
+      { "text": "Allow", "autoClick": true },
+      { "text": "Yes", "autoClick": true },
+      { "text": "No", "autoClick": false },
+      { "text": "Cancel", "autoClick": false }
+    ]
+  },
+  "actions": {
+    "targets": ["Yes", "Allow", "OK"],
+    "clickType": "single",
+    "clickDelay": 500,
+    "keyboardKey": "",
+    "postClickAction": "resume"
+  },
+  "ai": {
+    "provider": "",
+    "endpoint": "",
+    "model": "",
+    "autoDecide": false,
+    "confidenceThreshold": 85,
+    "promptTemplate": ""
+  }
+}
