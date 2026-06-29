@@ -7,7 +7,7 @@
 set -e
 
 echo "=========================================================="
-echo "🎯 FZautochoice — Installer & Local Build System"
+echo "🎯 FZautochoice — Installer & Multi-OS Build System"
 echo "=========================================================="
 
 # Check Node.js version
@@ -22,15 +22,6 @@ if ! command -v npm &> /dev/null; then
     exit 1
 fi
 
-# Check Linux native build dependencies
-if [ "$(uname)" == "Linux" ]; then
-    echo "🔍 Checking Linux package system dependencies..."
-    if ! command -v xdotool &> /dev/null; then
-        echo "⚠️ Warning: 'xdotool' is missing. Please install it with:"
-        echo "   sudo apt-get install xdotool"
-    fi
-fi
-
 # Step 1: Install node modules
 echo "📦 [1/3] Installing NPM dependencies..."
 npm install --no-bin-links
@@ -39,13 +30,13 @@ npm install --no-bin-links
 echo "⚙️ [2/3] Compiling TypeScript and bundling Vite..."
 npm run build
 
-# Step 3: Run electron-builder for Linux locally (Windows compiled natively in GitHub Actions CI/CD)
-echo "🚀 [3/3] Packaging executables for Linux (AppImage/deb)..."
+# Step 3: Run electron-builder for Linux and Windows using /tmp for packaging output to prevent mount link failures
+echo "🚀 [3/3] Packaging executables for Linux and Windows..."
 TMP_OUT_DIR="/tmp/fzautochoice-dist-$(date +%s)"
 mkdir -p "$TMP_OUT_DIR"
 
 # Run packaging using /tmp output directory to support mounts
-node node_modules/electron-builder/cli.js --linux -c.directories.output="$TMP_OUT_DIR"
+node node_modules/electron-builder/cli.js --linux --win -c.directories.output="$TMP_OUT_DIR"
 
 # Copy outputs back to workspace dist/
 echo "🚚 Copying built packages to dist/..."
@@ -54,11 +45,12 @@ cp -R "$TMP_OUT_DIR"/* dist/ || true
 rm -rf "$TMP_OUT_DIR"
 
 echo "=========================================================="
-echo "✅ Local Build Complete! Executables created successfully:"
+echo "✅ Compilation Complete! Executables created successfully:"
 echo "=========================================================="
 echo "🐧 Linux executables (in dist/):"
 ls -la dist/ | grep -iE '(\.appimage|\.deb)' || echo "   (No Linux files found)"
 echo ""
-echo "🪟 Windows portable exe and installers are built automatically"
-echo "   via GitHub Actions CI/CD when tagging a release (e.g. git tag v1.0.0)"
+echo "🪟 Windows executables (in dist/):"
+ls -la dist/ | grep -iE '(\.exe)' || echo "   (No Windows files found)"
 echo "=========================================================="
+
