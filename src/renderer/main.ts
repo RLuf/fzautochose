@@ -3,13 +3,6 @@
  * Handles tab navigation, UI event binding, and IPC communication
  */
 
-// ── Type definitions for the exposed API ──
-declare global {
-  interface Window {
-    fzApi: typeof import('../preload/index').fzApi;
-  }
-}
-
 // ── State ──
 interface AppState {
   isMonitoring: boolean;
@@ -48,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSettingsTab();
   initLogPanel();
   initGlobalControls();
+  initHelpTab();
 
   addLog('info', 'FZautochoice v1.0.0 initialized successfully.');
 
@@ -697,4 +691,37 @@ function escapeHtml(text: string): string {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ── Help Tab ──
+function initHelpTab(): void {
+  const btnCopyPix = document.getElementById('btn-copy-pix');
+  const pixKeyInput = document.getElementById('pix-key') as HTMLInputElement;
+  const statusEl = document.getElementById('pix-copy-status');
+
+  btnCopyPix?.addEventListener('click', () => {
+    if (pixKeyInput) {
+      pixKeyInput.select();
+      pixKeyInput.setSelectionRange(0, 99999);
+      
+      navigator.clipboard.writeText(pixKeyInput.value).then(() => {
+        if (statusEl) {
+          statusEl.textContent = '✓ Pix key copied successfully!';
+          setTimeout(() => {
+            statusEl.textContent = '';
+          }, 3000);
+        }
+        showToast('Pix key copied to clipboard!', 'success');
+        addLog('success', 'Pix key copied: 51992452539');
+      }).catch(() => {
+        if (statusEl) {
+          statusEl.textContent = '❌ Failed to copy Pix key.';
+          setTimeout(() => {
+            statusEl.textContent = '';
+          }, 3000);
+        }
+        showToast('Failed to copy Pix key', 'error');
+      });
+    }
+  });
 }

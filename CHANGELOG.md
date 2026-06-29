@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### UI/UX
 - **Premium dark theme** — Deep navy glassmorphism design
 - **5-tab interface** — Detection, Actions, Schemas, AI Integration, Settings
+- **Help & About Tab** — Diagnostic screen with basic usage flow, screenshot match examples, developer details, support emails, license info, and a copyable PIX key button for Brazil (`51992452539`) with auto-copy support.
 - **Custom frameless titlebar** — With minimize/maximize/close controls
 - **Real-time activity log** — Resizable panel with timestamped entries
 - **Toast notifications** — Non-intrusive status feedback
@@ -74,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Global hotkeys (Ctrl+Shift+F9 start/stop, Ctrl+Shift+F10 test)
 
 #### Build & Distribution
+- **Multi-OS Installer (`install.sh`)** — Shell script installer to automatically setup node packages and compile executable packages for both Linux and Windows.
 - **Portable Windows exe** — Single file, no installation needed
 - **Windows NSIS installer** — Standard installer with directory selection
 - **Linux AppImage** — Portable, runs on most distributions
@@ -86,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AGENTS.md` — Development rules and architecture guide
 - `CHANGELOG.md` — This file
 - Example schema: `schemas/example-allow-dialog.fzschema`
+- **License Update** — Transitioned code licensing to CC-BY-4.0 (Creative Commons Attribution 4.0 International).
 
 ### Technical Details
 - **Framework**: Electron 36+ with electron-vite

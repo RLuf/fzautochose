@@ -17,6 +17,6 @@
   },
   "include": [
     "src/renderer/**/*.ts",
-    "src/preload/types.d.ts"
+    "src/preload/**/*.ts"
   ]
 }

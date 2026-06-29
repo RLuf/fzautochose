@@ -46,6 +46,9 @@
       <button class="tab-bar__tab" data-tab="settings" id="tab-settings">
         <span class="tab-bar__tab-icon">⚙️</span> Settings
       </button>
+      <button class="tab-bar__tab" data-tab="help" id="tab-help">
+        <span class="tab-bar__tab-icon">❓</span> Help & About
+      </button>
 
       <div class="tab-bar__spacer"></div>
 
@@ -632,6 +635,92 @@ Respond in JSON: {"action": "click", "target": "button_name", "confidence": 0.95
           <div class="form-group">
             <label class="form-label">OCR Engine</label>
             <input type="text" class="form-input" value="Tesseract.js v5" readonly />
+          </div>
+        </div>
+      </div>
+
+      <!-- ──── Help Tab ──── -->
+      <div class="tab-content" id="content-help">
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">📖</span> Instructions & Examples</div>
+              <div class="card__subtitle">Learn how to configure FZautochoice to automate dialog buttons</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <h4 class="form-label" style="font-size: var(--text-md); color: var(--text-primary); margin-top: 0;">Basic Usage Flow</h4>
+            <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-3);">
+              1. **Configure Match Text**: Enter a portion of text from the target dialog title or body in the **Detection** tab.<br>
+              2. **Add Options**: Add potential buttons to detect (e.g. Yes, No, Allow, OK) and check the checkbox to make them Auto-Click.<br>
+              3. **Set Action Targets**: In the **Actions** tab, define which text targets should receive the simulated clicks.<br>
+              4. **Start Scan**: Click the ▶ Start Monitoring button or press the global hotkey `Ctrl+Shift+F9`.
+            </p>
+            
+            <h4 class="form-label" style="font-size: var(--text-md); color: var(--text-primary); margin-top: var(--space-4);">Screenshot Match Examples</h4>
+            <div class="grid-2 mt-2">
+              <div style="background: var(--bg-tertiary); padding: var(--space-3); border-radius: var(--radius-md); border: 1px dashed var(--glass-border);">
+                <strong style="color: var(--accent-primary);">1. Title/Question Match:</strong>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">
+                  "Confirm action?" -> Match Pattern: <code>Confirm action</code><br>
+                  Options: <code>Yes</code> (Checked), <code>Cancel</code> (Unchecked)
+                </p>
+              </div>
+              <div style="background: var(--bg-tertiary); padding: var(--space-3); border-radius: var(--radius-md); border: 1px dashed var(--glass-border);">
+                <strong style="color: var(--accent-primary);">2. AI Smart Matching:</strong>
+                <p style="font-size: var(--text-xs); color: var(--text-tertiary); margin-top: var(--space-1);">
+                  Enable **AI auto-decision** under the **AI Integration** tab. It analyzes standard and complex dialogs dynamically to determine the most reasonable button to click.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">ℹ️</span> About the Author</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Developer</label>
+              <input type="text" class="form-input" value="Roger Luft (veilwaker)" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Websites & Links</label>
+              <div class="flex-row gap-2" style="margin-top: 4px;">
+                <a href="https://about.rogerluft.com.br" target="_blank" class="tag tag--primary" style="text-decoration:none; display: inline-flex;">about.rogerluft.com.br</a>
+                <a href="https://github.com/RLuf" target="_blank" class="tag tag--primary" style="text-decoration:none; display: inline-flex;">github.com/RLuf</a>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2 mt-2">
+            <div class="form-group">
+              <label class="form-label">Support Emails</label>
+              <input type="text" class="form-input form-input--mono" value="roger@webstorage.com.br | rlufti@gmail.com" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">License</label>
+              <input type="text" class="form-input" value="CC-BY-4.0 (Creative Commons Attribution 4.0)" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title"><span class="card__title-icon">💝</span> Support & Donation</div>
+              <div class="card__subtitle">If FZautochoice helped you automate repetitive tasks, consider showing some support!</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pix Key (Brazil) — click button to copy key</label>
+            <div class="add-row">
+              <input type="text" class="form-input form-input--mono" id="pix-key" value="51992452539" readonly />
+              <button class="btn btn--primary" id="btn-copy-pix">📋 Copy Key</button>
+            </div>
+            <span id="pix-copy-status" style="font-size: var(--text-xs); color: var(--accent-success); margin-top: 4px; display: block; height: 16px;"></span>
           </div>
         </div>
       </div>

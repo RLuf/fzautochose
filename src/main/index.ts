@@ -6,6 +6,35 @@ import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage } from 'ele
 import { join } from 'path'
 import { registerIpcHandlers } from './ipc-handlers'
 
+// Parse CLI help argument
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(`
+FZautochoice v1.0.0
+Cross-platform desktop application for automated dialog detection and button clicking.
+
+Usage:
+  fzautochoice [options]
+
+Options:
+  -h, --help     Show this help screen
+  --version      Print version information
+
+System Hotkeys:
+  Ctrl+Shift+F9   Start/Stop dialog monitoring
+  Ctrl+Shift+F10  Perform a single test scan
+
+Author: Roger Luft (veilwaker)
+Website: https://about.rogerluft.com.br
+License: CC-BY-4.0
+  `);
+  process.exit(0);
+}
+
+if (process.argv.includes('--version')) {
+  console.log('FZautochoice v1.0.0');
+  process.exit(0);
+}
+
 /** The main application window */
 let mainWindow: BrowserWindow | null = null
 
